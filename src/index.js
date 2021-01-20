@@ -1,7 +1,7 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import Player from '@vimeo/player';
-import eventNames from './eventNames';
+import React from "react";
+import PropTypes from "prop-types";
+import Player from "@vimeo/player";
+import eventNames from "./eventNames";
 
 class Vimeo extends React.Component {
   constructor(props) {
@@ -16,7 +16,9 @@ class Vimeo extends React.Component {
 
   componentDidUpdate(prevProps) {
     // eslint-disable-next-line react/destructuring-assignment
-    const changes = Object.keys(this.props).filter((name) => this.props[name] !== prevProps[name]);
+    const changes = Object.keys(this.props).filter(
+      (name) => this.props[name] !== prevProps[name]
+    );
 
     this.updateProps(changes);
   }
@@ -58,19 +60,22 @@ class Vimeo extends React.Component {
       // eslint-disable-next-line react/destructuring-assignment
       const value = this.props[name];
       switch (name) {
-        case 'autopause':
+        case "autopause":
           player.setAutopause(value);
           break;
-        case 'color':
+        case "color":
           player.setColor(value);
           break;
-        case 'loop':
+        case "loop":
           player.setLoop(value);
           break;
-        case 'volume':
+        case "volume":
           player.setVolume(value);
           break;
-        case 'paused':
+        case "currentTime":
+          player.setCurrentTime(value);
+          break;
+        case "paused":
           player.getPaused().then((paused) => {
             if (value && !paused) {
               return player.pause();
@@ -81,18 +86,18 @@ class Vimeo extends React.Component {
             return null;
           });
           break;
-        case 'width':
-        case 'height':
+        case "width":
+        case "height":
           player.element[name] = value;
           break;
-        case 'video':
+        case "video":
           if (value) {
             const { start } = this.props;
             const loaded = player.loadVideo(value);
             // Set the start time only when loading a new video.
             // It seems like this has to be done after the video has loaded, else it just starts at
             // the beginning!
-            if (typeof start === 'number') {
+            if (typeof start === "number") {
               loaded.then(() => {
                 player.setCurrentTime(start);
               });
@@ -102,7 +107,7 @@ class Vimeo extends React.Component {
           }
           break;
         default:
-          // Nothing
+        // Nothing
       }
     });
   }
@@ -127,24 +132,27 @@ class Vimeo extends React.Component {
     });
 
     const { onError, onReady } = this.props;
-    this.player.ready().then(() => {
-      if (onReady) {
-        onReady(this.player);
+    this.player.ready().then(
+      () => {
+        if (onReady) {
+          onReady(this.player);
+        }
+      },
+      (err) => {
+        if (onError) {
+          onError(err);
+        } else {
+          throw err;
+        }
       }
-    }, (err) => {
-      if (onError) {
-        onError(err);
-      } else {
-        throw err;
-      }
-    });
+    );
 
-    if (typeof start === 'number') {
+    if (typeof start === "number") {
       this.player.setCurrentTime(start);
     }
 
-    if (typeof volume === 'number') {
-      this.updateProps(['volume']);
+    if (typeof volume === "number") {
+      this.updateProps(["volume"]);
     }
   }
 
@@ -169,15 +177,12 @@ class Vimeo extends React.Component {
   }
 }
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== "production") {
   Vimeo.propTypes = {
     /**
      * A Vimeo video ID or URL.
      */
-    video: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]),
+    video: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /**
      * DOM ID for the player element.
      */
@@ -193,17 +198,11 @@ if (process.env.NODE_ENV !== 'production') {
     /**
      * Width of the player element.
      */
-    width: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]),
+    width: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
     /**
      * Height of the player element.
      */
-    height: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]),
+    height: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
 
     /**
      * Pause the video.
@@ -214,6 +213,11 @@ if (process.env.NODE_ENV !== 'production') {
      * The playback volume as a number between 0 and 1.
      */
     volume: PropTypes.number,
+
+    /**
+     * The currentTime
+     */
+    currentTime: PropTypes.number,
 
     /**
      * The time in seconds at which to start playing the video.
